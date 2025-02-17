@@ -1,14 +1,15 @@
-// Uncomment this line to use CSS modules
-// import styles from './app.module.css';
-
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { Login } from './login';
+import { Home } from './home';
+import { SignIn } from './signin';
+import { SignUp } from './signup';
 
 export function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<SignUp />} />
+        <Route path="/signin" element={<SignIn />} />
+        <Route path="/home" element={<Home />} />
       </Routes>
     </BrowserRouter>
   );
