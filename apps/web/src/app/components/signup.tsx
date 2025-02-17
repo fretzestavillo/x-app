@@ -65,13 +65,20 @@ export function SignUp() {
       }
 
       const result = await response.json();
-      reset();
-      setSnackbarMessage('Signup Successful!');
-      setSnackbarSeverity('success');
-      setOpenSnackbar(true);
-      setTimeout(() => {
-        navigate('/signin');
-      }, 2000);
+
+      if (result.message === 'Email already exists!') {
+        setSnackbarMessage(`${result.message}`);
+        setSnackbarSeverity('error');
+        setOpenSnackbar(true);
+        reset();
+      } else {
+        setSnackbarMessage(`${result.message}`);
+        setSnackbarSeverity('success');
+        setOpenSnackbar(true);
+        setTimeout(() => {
+          navigate('/signin');
+        }, 2000);
+      }
     } catch (error) {
       setSnackbarMessage('Signup Failed! Please try again.');
       setSnackbarSeverity('error');
