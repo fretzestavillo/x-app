@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserXEntity } from './auth.entity';
@@ -27,20 +27,31 @@ export class AuthService {
   }
 
   async signUp(data: SignupDto): Promise<object> {
+    const existingUser = await this.userRepository.findOne({
+      where: { email: data.email },
+    });
+
+    if (existingUser) {
+      return { message: 'Email already exists!' }; // If user is found, return a message
+    }
+
     const userEntity = new UserXEntity();
     const joinDate = new Date();
     const philippinesTime = new Date(
       joinDate.toLocaleString('en-US', { timeZone: 'Asia/Manila' })
     );
 
+    // Set the user data
     userEntity.full_name = data.full_name;
     userEntity.born_date = data.born_date;
     userEntity.join_date = philippinesTime;
     userEntity.email = data.email;
     userEntity.password = await this.hashPassword(data.password);
 
+    // Save the new user
     await this.userRepository.save(userEntity);
-    return { message: 'Signup Successful!' };
+
+    return { message: 'Signup Successful!' }; // Return success message after the user is saved
   }
 
   async signIn(
