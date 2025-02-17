@@ -57,8 +57,9 @@ export function SignIn() {
       setSnackbarMessage('Login Successful!');
       setSnackbarSeverity('success');
       setOpenSnackbar(true);
-      console.log(result);
-      //   navigate('/home');
+      localStorage.setItem('user', JSON.stringify(result));
+
+      navigate('/home');
     } catch (error) {
       setSnackbarMessage('Login Failed! Please check your credentials.');
       setSnackbarSeverity('error');
