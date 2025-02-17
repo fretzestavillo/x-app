@@ -1,11 +1,13 @@
 import { Avatar } from '@mui/material';
 import { red } from '@mui/material/colors';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export function Home() {
   const [id, setId] = useState('');
   const [accessToken, setAccessToken] = useState('');
   const [name, setName] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
@@ -17,6 +19,7 @@ export function Home() {
       setAccessToken(parsedUserData.accessToken);
       setName(parsedUserData.name);
     } else {
+      navigate('/signin');
       console.log('No user data found in local storage.');
     }
   }, []);
