@@ -1,7 +1,17 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto, SignupDto } from './auth.dto';
-import { UserXEntity } from './auth.entity';
+import { AuthGuard } from './auth.guard';
 
 @Controller()
 export class AuthController {
@@ -17,5 +27,11 @@ export class AuthController {
   async login(@Body() data: LoginDto): Promise<any> {
     const result = await this.authService.signIn(data);
     return result;
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('profile')
+  getProfile(@Request() req) {
+    return { data: 'fck' };
   }
 }
