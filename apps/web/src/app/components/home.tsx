@@ -44,7 +44,7 @@ export function Home() {
       setId(parsedUserData.id);
       setAccessToken(parsedUserData.accessToken);
       setName(parsedUserData.name);
-      setprofilePic(parsedUserData.profilePic);
+      setprofilePic(parsedUserData.filepath);
     } else {
       navigate('/signin');
       console.log('No user data found in local storage.');
@@ -61,26 +61,44 @@ export function Home() {
   return (
     <>
       {showUpload && (
-        <UploadProfilePic id={id} onClose={() => setShowUpload(false)} />
+        <UploadProfilePic
+          id={id}
+          onClose={() => setShowUpload(false)}
+          setProfilePic={setprofilePic}
+        />
       )}
 
       <div>
-        <Avatar
-          sx={{
-            bgcolor: deepOrange[500],
-            cursor: 'pointer',
-            mt: 2, // Margin Top
-            ml: 2, // Margin Left
-          }}
-          onClick={handleClick}
-        >
-          {name
-            .trim()
-            .split(' ')
-            .filter(Boolean)
-            .map((part) => part[0].toUpperCase())
-            .join('')}
-        </Avatar>
+        {profilePic ? (
+          // If profilePic exists, show the Avatar with the image
+          <Avatar
+            sx={{
+              cursor: 'pointer',
+              mt: 2, // Margin Top
+              ml: 2, // Margin Left
+            }}
+            onClick={handleClick}
+            src={profilePic}
+          />
+        ) : (
+          // If profilePic does not exist, show the Avatar with initials
+          <Avatar
+            sx={{
+              bgcolor: deepOrange[500],
+              cursor: 'pointer',
+              mt: 2, // Margin Top
+              ml: 2, // Margin Left
+            }}
+            onClick={handleClick}
+          >
+            {name
+              .trim()
+              .split(' ')
+              .filter(Boolean)
+              .map((part) => part[0].toUpperCase())
+              .join('')}
+          </Avatar>
+        )}
       </div>
 
       <Box
