@@ -54,12 +54,10 @@ export class AuthService {
     return { message: 'Signup Successful!' }; // Return success message after the user is saved
   }
 
-  async signIn(
-    data: LoginDto
-  ): Promise<{
+  async signIn(data: LoginDto): Promise<{
     id: string;
     name: string;
-    profilpic: string;
+    filepath: string;
     access_token: string;
   }> {
     const user = await this.userRepository.findOne({
@@ -86,7 +84,7 @@ export class AuthService {
     return {
       id: payload.id,
       name: payload.fullName,
-      profilpic: payload.profilepic,
+      filepath: payload.profilepic,
       access_token: await this.jwtService.signAsync(payload),
     };
   }
