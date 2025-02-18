@@ -4,9 +4,14 @@ import { Box, Button, Avatar, Stack, Snackbar, Alert } from '@mui/material';
 interface UploadProfilePicProps {
   id: string;
   onClose: () => void; // Function to close the modal
+  setProfilePic: (newProfilePic: string) => void; // Function to set the new profile pic (e.g., URL or base64)
 }
 
-export function UploadProfilePic({ id, onClose }: UploadProfilePicProps) {
+export function UploadProfilePic({
+  id,
+  onClose,
+  setProfilePic,
+}: UploadProfilePicProps) {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [snackbar, setSnackbar] = useState<{
@@ -47,7 +52,7 @@ export function UploadProfilePic({ id, onClose }: UploadProfilePicProps) {
         method: 'POST',
         body: formData,
       });
-      const data = await response.json(); // Assuming the response contains a JSON object with a message
+      const data = await response.json();
 
       if (response.ok) {
         setSnackbar({
@@ -55,9 +60,13 @@ export function UploadProfilePic({ id, onClose }: UploadProfilePicProps) {
           message: data.message,
           severity: 'success',
         });
-        // Example for closing modal after 2 seconds (2000 milliseconds)
+        setProfilePic(data.filePath);
+        const userData = JSON.parse(localStorage.getItem('user') || '{}');
+        userData.filepath = data.filePath;
+        localStorage.setItem('user', JSON.stringify(userData));
+
         setTimeout(() => {
-          onClose(); // Close modal
+          onClose();
         }, 2000);
       } else {
         setSnackbar({
