@@ -41,11 +41,11 @@ export class PostController {
 
     // Save the file to disk
     fs.writeFileSync(filePath, file.buffer);
-    Logger.log(`File saved to: ${filePath}`);
 
-    const fileUrl = `http://localhost:3000/uploads/${filename}`;
+    //should be replace in production
+    const host = 'http://localhost:3000';
 
-    Logger.log(`File saved to: ${fileUrl}`);
+    const fileUrl = `${host}/uploads/${filename}`;
 
     // Optionally, save file path in the database
     const fileEntity = await this.postService.uploadProfilePic(
