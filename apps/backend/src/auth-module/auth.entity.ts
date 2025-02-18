@@ -6,21 +6,24 @@ export class UserXEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column({ nullable: true })
+  filePath: string; // Store file path
+
   @OneToMany(() => PostEntity, (post) => post.user)
   posts: PostEntity[];
 
-  @Column()
+  @Column({ nullable: true })
   full_name: string;
 
-  @Column()
+  @Column({ nullable: true })
   born_date: string;
 
   @Column({ default: () => 'CURRENT_TIMESTAMP' })
   join_date: Date;
 
-  @Column()
+  @Column({ nullable: true })
   email: string;
 
-  @Column()
+  @Column({ nullable: true })
   password: string;
 }
