@@ -5,6 +5,7 @@ import { UserXEntity } from './auth-module/auth.entity';
 import { ConfigModule } from '@nestjs/config';
 import { PostEntity } from './post/post.entity';
 import { PostModule } from './post/post.module';
+import { ProfilePicEntity } from './post/profile.pic.entity';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { PostModule } from './post/post.module';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [UserXEntity, PostEntity],
+      entities: [UserXEntity, PostEntity, ProfilePicEntity],
       synchronize: true, // Set to false in production for safety
     }),
     AuthModule,
