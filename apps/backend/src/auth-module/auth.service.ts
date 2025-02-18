@@ -56,7 +56,12 @@ export class AuthService {
 
   async signIn(
     data: LoginDto
-  ): Promise<{ id: string; name: string; access_token: string }> {
+  ): Promise<{
+    id: string;
+    name: string;
+    profilpic: string;
+    access_token: string;
+  }> {
     const user = await this.userRepository.findOne({
       where: { email: data.email },
     });
@@ -73,10 +78,15 @@ export class AuthService {
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    const payload = { id: user.id, fullName: user.full_name };
+    const payload = {
+      id: user.id,
+      fullName: user.full_name,
+      profilepic: user.filePath,
+    };
     return {
       id: payload.id,
       name: payload.fullName,
+      profilpic: payload.profilepic,
       access_token: await this.jwtService.signAsync(payload),
     };
   }
