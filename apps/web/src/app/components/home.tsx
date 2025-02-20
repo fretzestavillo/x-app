@@ -22,18 +22,25 @@ import {
   FavoriteBorder,
   Visibility,
 } from '@mui/icons-material';
+import AddIcon from '@mui/icons-material/Add';
+import { Fab } from '@mui/material';
+
 import { UploadProfilePic } from './uploadprofilepic';
+import { PostComponent } from './post';
 
 export function Home() {
   const [id, setId] = useState('');
   const [accessToken, setAccessToken] = useState('');
   const [name, setName] = useState('');
+  const username = name.toLowerCase().replace(/\s+/g, '');
+
   const [profilePic, setprofilePic] = useState('');
   const [activeTab, setActiveTab] = useState(0);
   const [posts, setPosts] = useState(mockPosts); // Use mock data for now
   const navigate = useNavigate();
 
   const [showUpload, setShowUpload] = useState(false); // Toggle state for showing the upload component
+  const [showPost, setShowPost] = useState(false); // Toggle state for showing the upload component
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
@@ -58,13 +65,44 @@ export function Home() {
     setShowUpload((prev) => !prev); // Toggle the state
   }
 
+  function handleClickPost() {
+    setShowPost((prev) => !prev); // Toggle the state
+  }
+
   return (
     <>
+      <Fab
+        color="primary"
+        sx={{
+          position: 'fixed',
+          bottom: 16, // Adjust distance from bottom
+          right: 16, // Adjust distance from right
+          width: 64, // Increase button size
+          height: 64, // Ensure it's circular
+          boxShadow: 4, // Adds some elevation
+          cursor: 'pointer',
+        }}
+        onClick={handleClickPost}
+      >
+        <AddIcon sx={{ fontSize: 34 }} /> {/* Increase icon size */}
+      </Fab>
+
       {showUpload && (
         <UploadProfilePic
           id={id}
           onClose={() => setShowUpload(false)}
           setProfilePic={setprofilePic}
+        />
+      )}
+
+      {showPost && (
+        <PostComponent
+          id={id}
+          accessToken={accessToken}
+          profilePic={profilePic}
+          fullName={name}
+          username={username}
+          onClose={() => setShowPost(false)}
         />
       )}
 
