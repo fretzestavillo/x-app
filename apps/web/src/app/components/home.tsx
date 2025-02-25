@@ -42,21 +42,21 @@ export function Home() {
   const [showUpload, setShowUpload] = useState(false); // Toggle state for showing the upload component
   const [showPost, setShowPost] = useState(false); // Toggle state for showing the upload component
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const response = await fetch('http://localhost:3000/api/getPost'); // Update with your actual backend URL
+  const fetchPosts = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/api/getPost'); // Update with your actual backend URL
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch posts');
-        }
-        const data = await response.json();
-        setPosts(data); // Store posts in state
-      } catch (error) {
-        console.error('Error fetching posts:', error);
+      if (!response.ok) {
+        throw new Error('Failed to fetch posts');
       }
-    };
+      const data = await response.json();
+      setPosts(data); // Store posts in state
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    }
+  };
 
+  useEffect(() => {
     fetchPosts();
   }, []);
 
@@ -120,6 +120,7 @@ export function Home() {
           fullName={name}
           username={username}
           onClose={() => setShowPost(false)}
+          refreshPosts={fetchPosts}
         />
       )}
 
