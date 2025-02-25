@@ -25,97 +25,58 @@ export class PostController {
   ) {
     Logger.log('Here at controller');
 
-    // Generate a unique filename to prevent overwriting
     const filename = Date.now() + '-' + file.originalname;
 
-    // Define the file path (where to store the file)
-    const uploadDir = path.join(__dirname, '..', '..', '..', 'uploads'); // Going up one level from the current directory (which may be dist)
-
-    // Check if the 'uploads' directory exists, if not, create it
+    const uploadDir = path.join(__dirname, '..', '..', '..', 'uploads');
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir);
     }
 
-    // Define the full file path
     const filePath = path.join(uploadDir, filename);
 
-    // Save the file to disk
     fs.writeFileSync(filePath, file.buffer);
 
-    //should be replace in production
     const host = 'http://localhost:3000';
 
     const fileUrl = `${host}/uploads/${filename}`;
 
-    // Optionally, save file path in the database
     const fileEntity = await this.postService.uploadProfilePic(
       fileUrl,
       body.id
-    ); // Assuming FileService has a saveFile method
+    );
 
     return {
       message: 'Profile picture uploaded successfully!',
-      filePath: fileEntity.filePath, // Return file path or any necessary info
+      filePath: fileEntity.filePath,
     };
   }
 
-
-
-
-
-
   @Post('uploadPost')
-  @UseInterceptors(FileInterceptor('postFile')) // ✅ Must match frontend `formData.append('postFile', selectedFile)`
+  @UseInterceptors(FileInterceptor('postFile'))
   async uploadPost(
     @UploadedFile() file: Express.Multer.File,
     @Body() body: any
   ) {
-    Logger.log('Received file:', file ? file.originalname : 'No file uploaded'); // ✅ Debug log
-    Logger.log('Received form data:', body);
+    const filename = Date.now() + '-' + file.originalname;
+
+    const uploadDir = path.join(__dirname, '..', '..', '..', 'uploads');
+
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir);
+    }
+
+    const filePath = path.join(uploadDir, filename);
+
+    fs.writeFileSync(filePath, file.buffer);
+
+    const host = 'http://localhost:3000';
+
+    const postFile = `${host}/uploads/${filename}`;
+
+    const postDataReturn = await this.postService.uploadPost(postFile, body);
 
     return {
-      message: 'File uploaded!',
-      fileDetails: file
-        ? {
-            name: file.originalname,
-            type: file.mimetype,
-            size: file.size,
-          }
-        : 'No file uploaded',
-      formData: body,
+      message: 'Profile picture uploaded successfully!',
     };
-
-    // Generate a unique filename to prevent overwriting
-    // const filename = Date.now() + '-' + file.originalname;
-
-    // // Define the file path (where to store the file)
-    // const uploadDir = path.join(__dirname, '..', '..', '..', 'uploads'); // Going up one level from the current directory (which may be dist)
-
-    // // Check if the 'uploads' directory exists, if not, create it
-    // if (!fs.existsSync(uploadDir)) {
-    //   fs.mkdirSync(uploadDir);
-    // }
-
-    // // Define the full file path
-    // const filePath = path.join(uploadDir, filename);
-
-    // // Save the file to disk
-    // fs.writeFileSync(filePath, file.buffer);
-
-    // //should be replace in production
-    // const host = 'http://localhost:3000';
-
-    // const fileUrl = `${host}/uploads/${filename}`;
-
-    // // Optionally, save file path in the database
-    // const fileEntity = await this.postService.uploadProfilePic(
-    //   fileUrl,
-    //   body.id
-    // ); // Assuming FileService has a saveFile method
-
-    // return {
-    //   message: 'Profile picture uploaded successfully!',
-    //   filePath: fileEntity.filePath, // Return file path or any necessary info
-    // };
   }
 }

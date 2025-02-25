@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
@@ -10,29 +10,51 @@ import { UserXEntity } from '../auth-module/auth.entity';
 export class PostService {
   constructor(
     @InjectRepository(PostEntity)
-    private postRepository: Repository<PostEntity>, // Inject Post repository
+    private postRepository: Repository<PostEntity>,
 
     @InjectRepository(UserXEntity)
-    private userXRepository: Repository<UserXEntity>, // Inject UserXEntity repository (if needed)
+    private userXRepository: Repository<UserXEntity>,
 
     @InjectRepository(ProfilePicEntity)
-    private profilePicRepository: Repository<ProfilePicEntity>, // Inject Post repository
+    private profilePicRepository: Repository<ProfilePicEntity>,
 
-    private jwtService: JwtService // Inject JwtService
+    private jwtService: JwtService
   ) {}
 
   async uploadProfilePic(filePath: string, userId: string) {
-    // Find the user by ID from the repository
     const userX = await this.userXRepository.findOne({ where: { id: userId } });
 
     if (!userX) {
       throw new Error('User not found');
     }
 
-    // Update the user's profile picture path
     userX.filePath = filePath;
 
-    // Save the updated user entity
     return await this.userXRepository.save(userX);
+  }
+
+  async uploadPost(postFile: string, body: PostDataForm) {
+    const user = await this.userXRepository.findOne({
+      where: { id: body.id },
+    });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const newPost = this.postRepository.create({
+      user,
+      profilePic: body.profilePic,
+      fullName: body.fullName,
+      username: body.username,
+      postText: body.postText,
+      postContent: postFile ? postFile : null,
+      messageCount: 0,
+      repostCount: 0,
+      heartCount: 0,
+      viewsCount: 0,
+    });
+
+    return this.postRepository.save(newPost);
   }
 }
