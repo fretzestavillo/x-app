@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Logger,
   Post,
   UploadedFile,
@@ -78,5 +79,10 @@ export class PostController {
     return {
       message: 'Profile picture uploaded successfully!',
     };
+  }
+
+  @Get('getPost') // Defines the GET route
+  async getPost() {
+    return this.postService.getPost();
   }
 }
