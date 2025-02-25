@@ -36,13 +36,29 @@ export function Home() {
 
   const [profilePic, setprofilePic] = useState('');
   const [activeTab, setActiveTab] = useState(0);
-  const [posts, setPosts] = useState(mockPosts); // Use mock data for now
+  const [posts, setPosts] = useState<Post[]>([]);
   const navigate = useNavigate();
 
   const [showUpload, setShowUpload] = useState(false); // Toggle state for showing the upload component
   const [showPost, setShowPost] = useState(false); // Toggle state for showing the upload component
 
-  console.log('accessToken ', accessToken);
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/api/getPost'); // Update with your actual backend URL
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch posts');
+        }
+        const data = await response.json();
+        setPosts(data); // Store posts in state
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+      }
+    };
+
+    fetchPosts();
+  }, []);
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
