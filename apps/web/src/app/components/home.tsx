@@ -42,14 +42,15 @@ export function Home() {
   const [showUpload, setShowUpload] = useState(false); // Toggle state for showing the upload component
   const [showPost, setShowPost] = useState(false); // Toggle state for showing the upload component
 
+  console.log('accessToken ', accessToken);
+
   useEffect(() => {
     const userData = localStorage.getItem('user');
 
     if (userData) {
       const parsedUserData = JSON.parse(userData);
-      console.log('User Data:', parsedUserData);
       setId(parsedUserData.id);
-      setAccessToken(parsedUserData.accessToken);
+      setAccessToken(parsedUserData.access_token);
       setName(parsedUserData.name);
       setprofilePic(parsedUserData.filepath);
     } else {
