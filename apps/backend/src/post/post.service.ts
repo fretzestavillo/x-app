@@ -42,11 +42,18 @@ export class PostService {
       throw new Error('User not found');
     }
 
+    const now = new Date();
+
+    const phTime = new Date(
+      now.toLocaleString('en-US', { timeZone: 'Asia/Manila' })
+    );
+
     const newPost = this.postRepository.create({
       user,
       profilePic: body.profilePic,
       fullName: body.fullName,
       username: body.username,
+      postDate: phTime,
       postText: body.postText,
       postContent: postFile ? postFile : null,
       messageCount: 0,
@@ -56,5 +63,33 @@ export class PostService {
     });
 
     return this.postRepository.save(newPost);
+  }
+
+  async getPost() {
+    const posts = await this.postRepository.find({
+      relations: ['user'], // Include user details
+      order: { postDate: 'DESC' }, // Sort by latest post
+    });
+
+    // Convert UTC dates to Philippine Time (PHT) and format response
+    return posts.map((post) => ({
+      id: post.id,
+      user: {
+        id: post.user.id,
+        fullName: post.user.full_name,
+      },
+      profilePic: post.profilePic,
+      fullName: post.fullName,
+      username: post.username,
+      postDate: new Date(post.postDate).toLocaleString('en-US', {
+        timeZone: 'Asia/Manila',
+      }),
+      postText: post.postText,
+      postContent: post.postContent || null,
+      messageCount: post.messageCount,
+      repostCount: post.repostCount,
+      heartCount: post.heartCount,
+      viewsCount: post.viewsCount,
+    }));
   }
 }
