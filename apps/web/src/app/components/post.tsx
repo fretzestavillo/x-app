@@ -52,54 +52,64 @@ export function PostComponent({
     if (!postText.trim() && !selectedFile) return;
     console.log('Post submitted:', { text: postText, image: selectedFile });
 
-    const postData = {
-      id,
-      accessToken,
-      fullName,
-      username,
-      profilePic,
-      postText,
-      postFile: selectedFile,
-    };
+    const formData = new FormData();
+    formData.append('id', id);
+    formData.append('accessToken', accessToken);
+    formData.append('fullName', fullName);
+    formData.append('username', username);
+    formData.append('profilePic', profilePic);
+    formData.append('postText', postText);
+
+    // ✅ Only append file if it exists
+    if (selectedFile) {
+      formData.append('postFile', selectedFile); // Name must match backend
+    }
+
+    // Debugging: Log FormData keys to check if file is included
+    // Cast FormData as any to bypass TypeScript errors
+    for (const pair of (formData as any).entries()) {
+      console.log(pair[0], pair[1]); // Logs key-value pairs
+    }
 
     try {
       const url = 'http://localhost:3000/api/uploadPost';
       const response = await fetch(url, {
         method: 'POST',
-        body: JSON.stringify(postData),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        body: formData, // ✅ DO NOT manually set `Content-Type`
       });
-      const responseData = await response.json();
 
-      if (response.ok) {
-        setSnackbar({
-          open: true,
-          message: responseData.message,
-          severity: 'success',
-        });
-
-        const userData = JSON.parse(localStorage.getItem('user') || '{}');
-        userData.filepath = responseData.filePath;
-        localStorage.setItem('user', JSON.stringify(userData));
-
-        setTimeout(() => {
-          onClose();
-        }, 2000);
-      } else {
-        setSnackbar({
-          open: true,
-          message: 'Failed to upload profile picture.',
-          severity: 'error',
-        });
-      }
+      const result = await response.json();
+      console.log('Success:', result);
     } catch (error) {
       console.error('Error uploading file:', error);
-      setTimeout(() => {
-        onClose();
-      }, 2000);
     }
+    //   if (response.ok) {
+    //     setSnackbar({
+    //       open: true,
+    //       message: responseData.message,
+    //       severity: 'success',
+    //     });
+
+    //     const userData = JSON.parse(localStorage.getItem('user') || '{}');
+    //     userData.filepath = responseData.filePath;
+    //     localStorage.setItem('user', JSON.stringify(userData));
+
+    //     setTimeout(() => {
+    //       onClose();
+    //     }, 2000);
+    //   } else {
+    //     setSnackbar({
+    //       open: true,
+    //       message: 'Failed to upload profile picture.',
+    //       severity: 'error',
+    //     });
+    //   }
+    // } catch (error) {
+    //   console.error('Error uploading file:', error);
+    //   setTimeout(() => {
+    //     onClose();
+    //   }, 2000);
+    // }
   };
 
   return (

@@ -59,13 +59,31 @@ export class PostController {
     };
   }
 
+
+
+
+
+
   @Post('uploadPost')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('postFile')) // ✅ Must match frontend `formData.append('postFile', selectedFile)`
   async uploadPost(
     @UploadedFile() file: Express.Multer.File,
     @Body() body: any
   ) {
-    Logger.log('Here at controller');
+    Logger.log('Received file:', file ? file.originalname : 'No file uploaded'); // ✅ Debug log
+    Logger.log('Received form data:', body);
+
+    return {
+      message: 'File uploaded!',
+      fileDetails: file
+        ? {
+            name: file.originalname,
+            type: file.mimetype,
+            size: file.size,
+          }
+        : 'No file uploaded',
+      formData: body,
+    };
 
     // Generate a unique filename to prevent overwriting
     // const filename = Date.now() + '-' + file.originalname;
