@@ -17,6 +17,7 @@ interface PostBoxProps {
   profilePic: string;
   fullName: string;
   username: string;
+  refreshPosts: () => void;
 }
 
 export function PostComponent({
@@ -26,6 +27,7 @@ export function PostComponent({
   profilePic,
   fullName,
   username,
+  refreshPosts,
 }: PostBoxProps) {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -81,6 +83,7 @@ export function PostComponent({
         });
 
         setTimeout(() => {
+          window.location.reload();
           onClose();
         }, 2000);
       } else {
@@ -93,6 +96,7 @@ export function PostComponent({
     } catch (error) {
       console.error('Error uploading file:', error);
       setTimeout(() => {
+        refreshPosts();
         onClose();
       }, 2000);
     }
