@@ -21,7 +21,7 @@ export class PostEntity {
   @Column({ type: 'varchar', length: 255 })
   fullName: string;
 
-  @Column({ type: 'varchar', length: 100, unique: true })
+  @Column({ type: 'varchar', length: 100 })
   username: string;
 
   @CreateDateColumn()
