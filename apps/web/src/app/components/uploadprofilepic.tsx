@@ -3,8 +3,8 @@ import { Box, Button, Avatar, Stack, Snackbar, Alert } from '@mui/material';
 
 interface UploadProfilePicProps {
   id: string;
-  onClose: () => void; // Function to close the modal
-  setProfilePic: (newProfilePic: string) => void; // Function to set the new profile pic (e.g., URL or base64)
+  onClose: () => void;
+  setProfilePic: (newProfilePic: string) => void;
 }
 
 export function UploadProfilePic({
@@ -115,9 +115,8 @@ export function UploadProfilePic({
           backdropFilter: 'blur(5px)',
           zIndex: 999,
         }}
-        onClick={onClose} // Close when clicking outside the box
+        onClick={onClose}
       >
-        {/* Content box: Prevents modal from closing when clicking inside */}
         <Box
           sx={{
             backgroundColor: 'white',
@@ -128,17 +127,15 @@ export function UploadProfilePic({
             maxWidth: '400px',
             width: '100%',
           }}
-          onClick={(e) => e.stopPropagation()} // Stop event from bubbling up
+          onClick={(e) => e.stopPropagation()}
         >
           <h2>Upload Profile Picture</h2>
 
-          {/* Avatar preview */}
           <Avatar
             src={imageUrl || ''}
             sx={{ width: 150, height: 150, margin: 'auto', mb: 2 }}
           />
 
-          {/* File upload and Submit buttons */}
           <Stack spacing={2} alignItems="center">
             <Button variant="contained" component="label">
               Choose File
