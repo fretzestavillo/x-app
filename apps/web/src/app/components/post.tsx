@@ -8,6 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import ImageIcon from '@mui/icons-material/Image';
 import CloseIcon from '@mui/icons-material/Close';
 import Box from '@mui/material/Box';
+import { Alert, Snackbar } from '@mui/material';
 
 interface PostBoxProps {
   onClose: () => void;
@@ -60,15 +61,8 @@ export function PostComponent({
     formData.append('profilePic', profilePic);
     formData.append('postText', postText);
 
-    // ✅ Only append file if it exists
     if (selectedFile) {
       formData.append('postFile', selectedFile); // Name must match backend
-    }
-
-    // Debugging: Log FormData keys to check if file is included
-    // Cast FormData as any to bypass TypeScript errors
-    for (const pair of (formData as any).entries()) {
-      console.log(pair[0], pair[1]); // Logs key-value pairs
     }
 
     try {
@@ -77,115 +71,207 @@ export function PostComponent({
         method: 'POST',
         body: formData, // ✅ DO NOT manually set `Content-Type`
       });
+      const data = await response.json();
 
-      const result = await response.json();
-      console.log('Success:', result);
+      if (response.ok) {
+        setSnackbar({
+          open: true,
+          message: data.message,
+          severity: 'success',
+        });
+
+        setTimeout(() => {
+          onClose();
+        }, 2000);
+      } else {
+        setSnackbar({
+          open: true,
+          message: 'Failed to upload profile picture.',
+          severity: 'error',
+        });
+      }
     } catch (error) {
       console.error('Error uploading file:', error);
+      setTimeout(() => {
+        onClose();
+      }, 2000);
     }
-    //   if (response.ok) {
-    //     setSnackbar({
-    //       open: true,
-    //       message: responseData.message,
-    //       severity: 'success',
-    //     });
-
-    //     const userData = JSON.parse(localStorage.getItem('user') || '{}');
-    //     userData.filepath = responseData.filePath;
-    //     localStorage.setItem('user', JSON.stringify(userData));
-
-    //     setTimeout(() => {
-    //       onClose();
-    //     }, 2000);
-    //   } else {
-    //     setSnackbar({
-    //       open: true,
-    //       message: 'Failed to upload profile picture.',
-    //       severity: 'error',
-    //     });
-    //   }
-    // } catch (error) {
-    //   console.error('Error uploading file:', error);
-    //   setTimeout(() => {
-    //     onClose();
-    //   }, 2000);
-    // }
   };
 
   return (
-    <Box
-      sx={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100vw',
-        height: '100vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        backdropFilter: 'blur(5px)',
-        zIndex: 999,
-      }}
-      onClick={onClose}
-    >
-      <Card
-        sx={{
-          p: 2,
-          borderRadius: 2,
-          boxShadow: 3,
-          maxWidth: 500,
-          width: '100%',
-        }}
-        onClick={(e) => e.stopPropagation()}
+    <>
+      {/* ✅ Snackbar for success/error messages */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
-        <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Avatar src={profilePic} sx={{ width: 40, height: 40 }} />
-            <div>
-              <p style={{ fontWeight: 'bold' }}>{fullName}</p>
-              <p style={{ fontSize: '14px', color: 'gray' }}>@{username}</p>
-            </div>
-            <IconButton onClick={onClose} sx={{ marginLeft: 'auto' }}>
-              <CloseIcon />
-            </IconButton>
-          </div>
-          <TextField
-            placeholder="What's happening?"
-            value={postText}
-            onChange={(e) => setPostText(e.target.value)}
-            multiline
-            fullWidth
-          />
-          {imageUrl && (
-            <img
-              src={imageUrl}
-              alt="Preview"
-              style={{ width: '100%', borderRadius: '8px' }}
-            />
-          )}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+
+      <Box
+        sx={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          backdropFilter: 'blur(5px)',
+          zIndex: 999,
+        }}
+        onClick={onClose}
+      >
+        <Card
+          sx={{
+            p: 2,
+            borderRadius: 2,
+            boxShadow: 3,
+            maxWidth: 500,
+            width: '100%',
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <CardContent
+            sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
           >
-            <label htmlFor="file-upload" style={{ cursor: 'pointer' }}>
-              <ImageIcon color="primary" />
-              <input
-                type="file"
-                onChange={handleFileChange}
-                style={{ display: 'none' }}
-                id="file-upload"
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Avatar src={profilePic} sx={{ width: 40, height: 40 }} />
+              <div>
+                <p style={{ fontWeight: 'bold' }}>{fullName}</p>
+                <p style={{ fontSize: '14px', color: 'gray' }}>@{username}</p>
+              </div>
+              <IconButton onClick={onClose} sx={{ marginLeft: 'auto' }}>
+                <CloseIcon />
+              </IconButton>
+            </div>
+            <TextField
+              placeholder="What's happening?"
+              value={postText}
+              onChange={(e) => setPostText(e.target.value)}
+              multiline
+              fullWidth
+            />
+            {imageUrl && (
+              <img
+                src={imageUrl}
+                alt="Preview"
+                style={{ width: '100%', borderRadius: '8px' }}
               />
-            </label>
-            <Button onClick={handleSubmit} variant="contained" color="primary">
-              Post
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </Box>
+            )}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}
+            >
+              <label htmlFor="file-upload" style={{ cursor: 'pointer' }}>
+                <ImageIcon color="primary" />
+                <input
+                  type="file"
+                  onChange={handleFileChange}
+                  style={{ display: 'none' }}
+                  id="file-upload"
+                />
+              </label>
+              <Button
+                onClick={handleSubmit}
+                variant="contained"
+                color="primary"
+              >
+                Post
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </Box>
+    </>
   );
+
+  //   return (
+  //     <Box
+  //       sx={{
+  //         position: 'fixed',
+  //         top: 0,
+  //         left: 0,
+  //         width: '100vw',
+  //         height: '100vh',
+  //         display: 'flex',
+  //         justifyContent: 'center',
+  //         alignItems: 'center',
+  //         backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  //         backdropFilter: 'blur(5px)',
+  //         zIndex: 999,
+  //       }}
+  //       onClick={onClose}
+  //     >
+  //       <Card
+  //         sx={{
+  //           p: 2,
+  //           borderRadius: 2,
+  //           boxShadow: 3,
+  //           maxWidth: 500,
+  //           width: '100%',
+  //         }}
+  //         onClick={(e) => e.stopPropagation()}
+  //       >
+  //         <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+  //           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+  //             <Avatar src={profilePic} sx={{ width: 40, height: 40 }} />
+  //             <div>
+  //               <p style={{ fontWeight: 'bold' }}>{fullName}</p>
+  //               <p style={{ fontSize: '14px', color: 'gray' }}>@{username}</p>
+  //             </div>
+  //             <IconButton onClick={onClose} sx={{ marginLeft: 'auto' }}>
+  //               <CloseIcon />
+  //             </IconButton>
+  //           </div>
+  //           <TextField
+  //             placeholder="What's happening?"
+  //             value={postText}
+  //             onChange={(e) => setPostText(e.target.value)}
+  //             multiline
+  //             fullWidth
+  //           />
+  //           {imageUrl && (
+  //             <img
+  //               src={imageUrl}
+  //               alt="Preview"
+  //               style={{ width: '100%', borderRadius: '8px' }}
+  //             />
+  //           )}
+  //           <div
+  //             style={{
+  //               display: 'flex',
+  //               alignItems: 'center',
+  //               justifyContent: 'space-between',
+  //             }}
+  //           >
+  //             <label htmlFor="file-upload" style={{ cursor: 'pointer' }}>
+  //               <ImageIcon color="primary" />
+  //               <input
+  //                 type="file"
+  //                 onChange={handleFileChange}
+  //                 style={{ display: 'none' }}
+  //                 id="file-upload"
+  //               />
+  //             </label>
+  //             <Button onClick={handleSubmit} variant="contained" color="primary">
+  //               Post
+  //             </Button>
+  //           </div>
+  //         </CardContent>
+  //       </Card>
+  //     </Box>
+  //   );
 }
